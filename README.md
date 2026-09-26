@@ -51,8 +51,7 @@ dsh plugin add ./packages/skill-panel
 
 ### MCP 服务面板
 
-![添加 MCP 服务的表单](assets/screenshots/mcp-form.png)
-
+![MCP 服务分区：卡片带连接状态、编辑 / 删除与启用开关](assets/screenshots/mcp-panel.png)
 
 - **添加**：选择传输方式后填写
   - `Streamable HTTP`：服务名称、URL、请求头、请求超时时长
@@ -66,13 +65,14 @@ dsh plugin add ./packages/skill-panel
 
 配置最终写入 profile 的补丁层（见[数据位置](#数据与配置位置)），harness 热加载，**无需重启**。
 
+![添加 MCP 服务的表单](assets/screenshots/mcp-form.png)
+
 > ⚠️ **环境变量与请求头以明文保存**，其中通常含 API Key。请把该文件当作凭据对待，
 > 不要提交进任何公开仓库。
 
 ### 技能面板
 
-![SKILL.md 的内置 Markdown 渲染](assets/screenshots/skill-viewer.png)
-
+![技能分区：随插件分发的 create-skill 受保护，用户技能可删除](assets/screenshots/skill-panel.png)
 
 - **列表**：按作用域展示技能卡片（名称、描述、来源标记）。
 - **查看**：弹窗内以 Markdown 渲染 `SKILL.md`（frontmatter 单独成表），超过 256 KiB 会截断并提示。
@@ -81,8 +81,9 @@ dsh plugin add ./packages/skill-panel
 - **新建**：自动打开一个新会话，并在输入框预填 `/create-skill 创建一个技能，要求如下：`
   （`/create-skill` 渲染为技能引用）。若当前部署缺少会话服务，则降级为复制引导词到剪贴板并提示。
 
-![新建技能：自动开新会话并预填 /create-skill](assets/screenshots/new-session-prefill.png)
+![SKILL.md 的内置 Markdown 渲染](assets/screenshots/skill-viewer.png)
 
+![新建技能：自动开新会话并预填 /create-skill](assets/screenshots/new-session-prefill.png)
 
 ### create-skill（随插件分发的技能）
 
@@ -164,6 +165,7 @@ DSH_REPO=/path/to/deepseek-harness pnpm setup:harness
 
 ```
 dsh-pluginHive/
+├── assets/screenshots/  # README 配图
 ├── packages/
 │   ├── plugin-kit/        # 共享基座（面板注册 / Remote 代理 / UI 控件 / Markdown 渲染）
 │   ├── mcp-panel/         # MCP 服务面板
