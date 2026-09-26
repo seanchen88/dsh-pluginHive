@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib/types",
+    "composite": true,
+    "noEmit": false
+  },
+  "include": [
+    "src/index.ts",
+    "src/patch-writer.ts",
+    "src/types.ts",
+    "src/css-modules.d.ts",
+    "src/remote.d.ts"
+  ]
+}

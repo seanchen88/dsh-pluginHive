@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib/types",
+    "composite": true,
+    "noEmit": false,
+    "types": ["node", "react"]
+  },
+  "include": [
+    "src/client/**/*.ts",
+    "src/client/**/*.tsx",
+    "src/types.ts",
+    "src/css-modules.d.ts"
+  ],
+  "references": [{ "path": "../plugin-kit" }]
+}

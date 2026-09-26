@@ -1,0 +1,1 @@
+{"version":3,"file":"typert.remote-client.d.ts","names":["deleteSkill","importZip","list","readSkill"],"sources":["../src/controller.ts"],"sourcesContent":[null],"mappings":";;;;;;;;;IAsFQA,W;IAzCAC,S;IAbAC,I;IA6BAC,S;;;IAyBAH,wB;IAzCAC,sB;IAbAC,iB;IA6BAC,sB","ignoreList":[]}

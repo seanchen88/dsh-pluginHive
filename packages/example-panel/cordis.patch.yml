@@ -1,0 +1,5 @@
+# Bundle patch layer contributed when @dsh-plugins/example-panel is installed.
+# The browser half is discovered from this package's `dsh.client` declaration.
+- insert:
+    - id: example-panel
+      name: '@dsh-plugins/example-panel'

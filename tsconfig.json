@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/plugin-kit" },
+    { "path": "./packages/bundled-skills" },
+    { "path": "./packages/mcp-panel" },
+    { "path": "./packages/skill-panel" },
+    { "path": "./packages/example-panel" }
+  ]
+}

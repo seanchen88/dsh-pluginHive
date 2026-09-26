@@ -1,0 +1,37 @@
+/* MCP panel section layout. Colors/spacing come from --dsw-alias-* tokens. */
+
+.section { display: flex; flex-direction: column; gap: 20px; max-width: 900px; margin: 0 auto; padding: 8px 4px 40px; }
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.headerText { display: flex; flex-direction: column; gap: 8px; }
+.heading { margin: 0; font-size: 26px; font-weight: 700; color: var(--dsw-alias-text, #1a1a1a); }
+.intro { margin: 0; font-size: 14px; color: var(--dsw-alias-text-muted, #666); }
+.link { color: var(--dsw-alias-link, #2f6f4f); text-decoration: none; }
+.link:hover { text-decoration: underline; }
+
+.list { display: flex; flex-direction: column; gap: 12px; }
+.banner {
+  padding: 8px 12px; border-radius: 8px; font-size: 13px;
+  background: var(--dsw-alias-warning-surface, #fff6e0);
+  color: var(--dsw-alias-warning-text, #8a6d1a);
+  border: 1px solid var(--dsw-alias-warning-border, #f0dca0);
+}
+.error {
+  padding: 8px 12px; border-radius: 8px; font-size: 13px;
+  background: var(--dsw-alias-danger-surface, #fdecec);
+  color: var(--dsw-alias-danger-text, #a5322a);
+  border: 1px solid var(--dsw-alias-danger-border, #f3c9c6);
+}
+
+.statusDot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--dsw-alias-text-muted, #999); }
+.statusDot[data-state='connected'] { background: var(--dsw-alias-success, #2f9e57); }
+.statusDot[data-state='disabled'] { background: var(--dsw-alias-text-muted, #bbb); }
+
+.toolRow { display: flex; align-items: baseline; gap: 12px; font-size: 13px; }
+.toolName { font-weight: 600; color: var(--dsw-alias-text, #1a1a1a); min-width: 180px; }
+.toolDesc { color: var(--dsw-alias-text-muted, #777); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toolsHeading { font-size: 13px; color: var(--dsw-alias-text-muted, #888); }
+
+.formGrid { display: flex; flex-direction: column; gap: 4px; }
+.formLabel { font-size: 13px; color: var(--dsw-alias-text-muted, #666); margin-bottom: 4px; display: block; }
+.kv { display: flex; gap: 8px; margin-bottom: 6px; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; }

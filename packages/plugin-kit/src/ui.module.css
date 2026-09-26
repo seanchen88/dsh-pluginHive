@@ -1,0 +1,192 @@
+/*
+ * Copied management-page control styles. Every color/space comes from a
+ * `--dsw-alias-*` theme token (with a neutral fallback so the panel still
+ * renders if a token is renamed). Literal colors are avoided on purpose: a
+ * renamed token degrades appearance but never breaks rendering, and tokens are
+ * the only shared styling dependency with the host.
+ */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--dsw-alias-border, #e0e0e0);
+  background: var(--dsw-alias-surface, #f5f5f5);
+  color: var(--dsw-alias-text, #1a1a1a);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+.button:hover { background: var(--dsw-alias-surface-hover, #ececec); }
+.button:disabled { opacity: 0.5; cursor: not-allowed; }
+.buttonPrimary {
+  background: var(--dsw-alias-accent, #1a1a1a);
+  color: var(--dsw-alias-accent-text, #ffffff);
+  border-color: transparent;
+}
+.buttonPrimary:hover { background: var(--dsw-alias-accent-hover, #333333); }
+.buttonGhost { background: transparent; border-color: transparent; }
+.buttonGhost:hover { background: var(--dsw-alias-surface-hover, #ececec); }
+.buttonDanger { color: var(--dsw-alias-danger, #c0392b); }
+
+.row { display: flex; align-items: center; gap: 8px; }
+.spacer { flex: 1 1 auto; }
+
+.card {
+  border-radius: 12px;
+  background: var(--dsw-alias-surface, #f5f5f5);
+  border: 1px solid var(--dsw-alias-border-subtle, #ececec);
+  overflow: hidden;
+}
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+.cardTitle { font-size: 15px; font-weight: 600; color: var(--dsw-alias-text, #1a1a1a); }
+.cardBody { padding: 4px 16px 16px 16px; display: flex; flex-direction: column; gap: 14px; }
+.chevron {
+  width: 16px; height: 16px; flex: none;
+  transition: transform 0.15s ease;
+  color: var(--dsw-alias-text-muted, #888);
+}
+.chevronOpen { transform: rotate(90deg); }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 12px; color: var(--dsw-alias-text-muted, #888); }
+.value { font-size: 14px; color: var(--dsw-alias-text, #1a1a1a); word-break: break-all; }
+
+/*
+ * box-sizing 必须自己声明：宿主对插件元素施加的是 content-box（实测
+ * getComputedStyle(document.body).boxSizing === 'content-box'，它的 preflight 在
+ * @layer base / @scope 里盖不到我们）。而 .field 是 column flex，交叉轴 stretch
+ * 会把子项拉到容器内容宽，padding/border 再叠加上去 → 溢出 22px 并顶出横向滚动条。
+ */
+.input, .select {
+  box-sizing: border-box;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--dsw-alias-border, #e0e0e0);
+  background: var(--dsw-alias-input-surface, #ffffff);
+  color: var(--dsw-alias-text, #1a1a1a);
+  font-size: 14px;
+  width: 100%;
+}
+.textarea { box-sizing: border-box; width: 100%; min-height: 80px; padding: 8px 10px; resize: vertical; }
+
+.switch {
+  position: relative;
+  width: 38px; height: 22px;
+  border-radius: 999px;
+  border: none;
+  background: var(--dsw-alias-border, #d0d0d0);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex: none;
+}
+.switch[data-checked='true'] { background: var(--dsw-alias-accent, #1a1a1a); }
+.switchKnob {
+  position: absolute; top: 2px; left: 2px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+.switch[data-checked='true'] .switchKnob { transform: translateX(16px); }
+
+.tabs { display: flex; align-items: center; gap: 22px; border-bottom: 1px solid var(--dsw-alias-border-subtle, #ececec); }
+.tab {
+  appearance: none; background: none; border: none;
+  padding: 10px 0 12px; margin-bottom: -1px;
+  font-size: 15px; color: var(--dsw-alias-text-muted, #888);
+  cursor: pointer; border-bottom: 2px solid transparent;
+}
+.tab[data-active='true'] { color: var(--dsw-alias-text, #1a1a1a); font-weight: 600; border-bottom-color: var(--dsw-alias-text, #1a1a1a); }
+
+.tag {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--dsw-alias-surface, #f0f0f0);
+  color: var(--dsw-alias-text-muted, #666);
+  border: 1px solid var(--dsw-alias-border-subtle, #e6e6e6);
+  white-space: nowrap;
+}
+
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  /* Flex column so only the body scrolls: pinning the header/footer keeps the close
+     control reachable no matter how long the content is. */
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--dsw-alias-elevated, #ffffff);
+  border-radius: 14px;
+  border: 1px solid var(--dsw-alias-border, #e6e6e6);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+.modalHeader { flex: 0 0 auto; display: flex; align-items: flex-start; gap: 12px; padding: 16px 16px 10px 20px; font-size: 17px; font-weight: 600; border-bottom: 1px solid var(--dsw-alias-border-subtle, #f0f0f0); }
+.modalTitle { flex: 1 1 auto; min-width: 0; line-height: 1.4; }
+.modalClose { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 8px; border: none; background: transparent; color: var(--dsw-alias-text-muted, #888); font-size: 14px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.modalClose:hover { background: var(--dsw-alias-surface-muted, rgba(0, 0, 0, 0.06)); color: var(--dsw-alias-text, #1a1a1a); }
+.modalBody { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 14px 20px; display: flex; flex-direction: column; gap: 14px; }
+/* Children of a column flex container shrink by default, which would squash a tall
+   block (a multi-line <pre>, the frontmatter box) into a sliver instead of letting the
+   body overflow. Pin them to their natural height so `overflow-y: auto` actually scrolls. */
+.modalBody > * { flex: 0 0 auto; }
+.modalFooter { flex: 0 0 auto; padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--dsw-alias-border-subtle, #f0f0f0); }
+
+.empty { padding: 40px 0; text-align: center; color: var(--dsw-alias-text-muted, #999); font-size: 14px; }
+
+.tooltip { position: relative; display: inline-flex; }
+.tooltipText {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: var(--dsw-alias-text, #1a1a1a); color: var(--dsw-alias-accent-text, #fff);
+  padding: 4px 8px; border-radius: 6px; font-size: 12px; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 0.12s ease;
+}
+.tooltip:hover .tooltipText, .tooltip:focus-within .tooltipText { opacity: 1; }
+
+.spinner {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--dsw-alias-border, #ddd);
+  border-top-color: var(--dsw-alias-accent, #1a1a1a);
+  animation: dshspin 0.7s linear infinite;
+}
+@keyframes dshspin { to { transform: rotate(360deg); } }
+
+/* Markdown document rendering (see markdown.tsx). Theme tokens only. */
+.mdP { margin: 0 0 10px; line-height: 1.7; color: var(--dsw-alias-text, #1a1a1a); font-size: 14px; overflow-wrap: anywhere; }
+.mdH1, .mdH2, .mdH3, .mdH4 { margin: 18px 0 8px; font-weight: 650; color: var(--dsw-alias-text, #1a1a1a); line-height: 1.35; }
+.mdH1 { font-size: 19px; }
+.mdH2 { font-size: 17px; }
+.mdH3 { font-size: 15px; }
+.mdH4 { font-size: 14px; }
+.mdHr { border: none; border-top: 1px solid var(--dsw-alias-border, #e2e2e2); margin: 16px 0; }
+.mdCode { font-family: var(--dsw-alias-font-mono, ui-monospace, monospace); font-size: 12.5px;
+  background: var(--dsw-alias-surface-muted, rgba(0, 0, 0, 0.05)); border-radius: 4px; padding: 1px 5px; }
+.mdPre { margin: 0 0 12px; padding: 10px 12px; border-radius: 8px; overflow-x: auto;
+  background: var(--dsw-alias-surface-muted, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--dsw-alias-border, #e6e6e6); }
+.mdPre code { font-family: var(--dsw-alias-font-mono, ui-monospace, monospace); font-size: 12.5px; line-height: 1.6; white-space: pre; }
+.mdQuote { margin: 0 0 12px; padding: 2px 0 2px 12px; border-left: 3px solid var(--dsw-alias-border, #ddd);
+  color: var(--dsw-alias-text-muted, #666); }
+.mdList { margin: 0 0 12px; padding-left: 22px; line-height: 1.75; font-size: 14px; color: var(--dsw-alias-text, #1a1a1a); }
+.mdListGroup .mdList { margin: 0; }
+.mdListGroup .mdList + .mdList { padding-left: 34px; margin-bottom: 12px; }
+.mdTable { width: 100%; border-collapse: collapse; margin: 0 0 12px; font-size: 13.5px; }
+.mdTable th, .mdTable td { border: 1px solid var(--dsw-alias-border, #e4e4e4); padding: 6px 9px; text-align: left; vertical-align: top; }
+.mdTable th { background: var(--dsw-alias-surface-muted, rgba(0, 0, 0, 0.03)); font-weight: 600; }

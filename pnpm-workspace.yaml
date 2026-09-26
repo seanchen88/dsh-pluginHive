@@ -1,0 +1,12 @@
+packages:
+  - 'packages/*'
+
+# `packages/*/node_modules/@deepseek-ai/*` are symlinks INTO the harness checkout — the
+# link-workspace-packages=deep state the typert generator requires. Those packages declare
+# `workspace:*` dependencies that cannot resolve from this repo, so pnpm's automatic
+# "verify deps before run" step hits the registry and dies with ERR_PNPM_FETCH_404 on an
+# unpublished internal package. Install deliberately instead of implicitly.
+verifyDepsBeforeRun: false
+autoInstallPeers: false
+allowBuilds:
+  rolldown: set this to true or false

@@ -1,0 +1,32 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "baseUrl": "..",
+    "typeRoots": ["../node_modules/@types"],
+    "types": ["node", "react"],
+    "paths": {
+      "@dsh-plugins/plugin-kit": ["packages/plugin-kit/src/index.ts"],
+      "@dsh-plugins/bundled-skills": ["packages/bundled-skills/src/index.ts"]
+    }
+  },
+  "include": [
+    "stubs.d.ts",
+    "../packages/plugin-kit/src/**/*.ts",
+    "../packages/plugin-kit/src/**/*.tsx",
+    "../packages/bundled-skills/src/**/*.ts",
+    "../packages/mcp-panel/src/**/*.ts",
+    "../packages/mcp-panel/src/**/*.tsx",
+    "../packages/skill-panel/src/**/*.ts",
+    "../packages/skill-panel/src/**/*.tsx",
+    "../packages/example-panel/src/**/*.ts",
+    "../packages/example-panel/src/**/*.tsx"
+  ],
+  "exclude": [
+    "../packages/plugin-kit/src/client-bundle.ts",
+    "../packages/**/tsdown.config.ts"
+  ]
+}

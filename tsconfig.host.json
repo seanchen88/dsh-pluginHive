@@ -1,0 +1,12 @@
+{
+  // Host-face aggregate for the standalone typert generator run. The generator
+  // reads this file's projectReferences (filtered to <root>/packages) to know
+  // which packages contribute the host face, then emits ./typert + ./remote.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": { "noEmit": true, "composite": false },
+  "files": [],
+  "references": [
+    { "path": "./packages/mcp-panel/tsconfig.host.json" },
+    { "path": "./packages/skill-panel/tsconfig.host.json" }
+  ]
+}

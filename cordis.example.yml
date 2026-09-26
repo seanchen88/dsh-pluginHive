@@ -1,0 +1,6 @@
+# Minimal overlay for the offline browser check: mounts only the example panel
+# (browser-only, no host Remote) so the plugin mechanism can be verified without
+# the typert-generated mcp/skill remotes.
+- insert:
+  - id: example-panel
+    name: '@dsh-plugins/example-panel'

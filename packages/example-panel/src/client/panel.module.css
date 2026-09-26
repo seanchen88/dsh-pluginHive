@@ -1,0 +1,5 @@
+/* Example panel section layout. Colors come from --dsw-alias-* tokens. */
+
+.section { display: flex; flex-direction: column; gap: 12px; max-width: 900px; margin: 0 auto; padding: 8px 4px 40px; }
+.heading { margin: 0; font-size: 26px; font-weight: 700; color: var(--dsw-alias-text, #1a1a1a); }
+.intro { margin: 0; font-size: 14px; color: var(--dsw-alias-text-muted, #666); }
