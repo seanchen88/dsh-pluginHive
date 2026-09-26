@@ -35,7 +35,7 @@ dsh plugin add ./packages/skill-panel
 ```
 
 `dsh plugin add` 会把包写入 profile 的依赖与 bundle 列表，插件自带的
-`packages/*/cordis.patch.yml` 负责挂载宿主半，浏览器半由包内 `dsh.client` 声明被自动发现。
+`packages/*/cordis.patch.yml` 负责挂载宿主端，浏览器端由包内 `dsh.client` 声明被自动发现。
 重新打开设置页即可看到「MCP 服务」「技能」两个分区。
 
 只想要其中一个面板，就只 add 其中一个。
@@ -102,7 +102,7 @@ node packages/bundled-skills/skills/create-skill/scripts/validate_skill.mjs <技
 
 | 命令 | 作用 |
 |---|---|
-| `pnpm build` | 构建全部包（宿主半 + 浏览器半） |
+| `pnpm build` | 构建全部包（宿主端 + 浏览器端） |
 | `pnpm typecheck` | 独立类型检查（用 `typecheck/stubs.d.ts`，**不需要** harness checkout） |
 | `pnpm verify` | 类型检查 + zip 导入用例（11 项） |
 | `pnpm watch` | 监听构建 |
@@ -120,7 +120,7 @@ node packages/bundled-skills/skills/create-skill/scripts/validate_skill.mjs <技
 
 只有两件事需要它：
 
-1. **从本仓库直接运行宿主半**（harness 不启用 `--preserve-symlinks`，Node 会按包的**真实路径**向上解析）；
+1. **从本仓库直接运行宿主端**（harness 不启用 `--preserve-symlinks`，Node 会按包的**真实路径**向上解析）；
 2. **重新生成 Remote 产物**（typert 生成器未发布到 npm）。
 
 这时把 harness clone 到同级目录（或用 `DSH_REPO` 指定路径）：
@@ -178,7 +178,7 @@ dsh-pluginHive/
 └── AGENTS.md              # 工程约定与架构不变量
 ```
 
-每个面板包都是**双半**结构：`src/index.ts`（Node 宿主半）与 `src/client/`（浏览器半），
+每个面板包都是**双端**结构：`src/index.ts`（Node 宿主端）与 `src/client/`（浏览器端），
 由 `tsdown` 分别产出 `lib/index.js` 与 `lib/client.js`，再通过包名在运行时接上。
 
 ## 许可证
@@ -187,6 +187,6 @@ dsh-pluginHive/
 
 ## 链接
 
-- DeepSeek Harness 文档：<https://deepseek-harness.github.io/deepseek-harness/\>
+- DeepSeek Harness 文档：<https://deepseek-harness.github.io/deepseek-harness/>
 - 插件打包与发布：[config](https://deepseek-harness.github.io/deepseek-harness/develop/basic/config) ·
   [publish](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)
