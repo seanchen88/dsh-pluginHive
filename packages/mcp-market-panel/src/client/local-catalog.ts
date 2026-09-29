@@ -11,6 +11,7 @@
  *    so the user can override it instead of it being frozen into the config.
  */
 import { LOCAL_CATALOG_RAW } from './local-catalog-data.ts'
+import { plainText } from './registry.ts'
 import type { CatalogVariable, InstallCandidate, MarketServer } from './registry.ts'
 import { serverNameFromRegistry } from './slug.ts'
 
@@ -80,7 +81,7 @@ function toVariable(
     secret: variableNameLooksSecret(name),
   }
   const description = doc?.description
-  if (description !== undefined && description !== '') variable.description = description
+  if (description !== undefined && description !== '') variable.description = plainText(description)
   const placeholder = doc?.example
   if (placeholder !== undefined && placeholder !== '') variable.placeholder = placeholder
   if (literal !== undefined && literal !== '') variable.defaultValue = literal
@@ -128,7 +129,7 @@ export const LOCAL_SERVERS: readonly MarketServer[] = Object.entries(catalog.ser
   const server: { -readonly [K in keyof MarketServer]: MarketServer[K] } = {
     name: key,
     title: entry.displayName || serverNameFromRegistry(key),
-    description: entry.description,
+    description: plainText(entry.description),
     version: '',
     repositoryUrl: entry.repository,
     websiteUrl: entry.homepage,

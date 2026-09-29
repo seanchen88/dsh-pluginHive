@@ -58,7 +58,7 @@ dsh plugin add ./packages/mcp-market-panel   # 左栏「MCP 市场」
 
 ### MCP 服务面板
 
-![MCP 服务分区：卡片带连接状态、编辑 / 删除与启用开关](assets/screenshots/mcp-panel.png)
+![MCP 服务分区：状态点由实际注册的工具数推导，编辑 / 删除与启用开关](assets/screenshots/mcp-panel.png)
 
 - **添加**：选择传输方式后填写
   - `Streamable HTTP`：服务名称、URL、请求头、请求超时时长
@@ -96,8 +96,12 @@ dsh plugin add ./packages/mcp-market-panel   # 左栏「MCP 市场」
 
 安装后入口出现在**左栏「插件」下方**（不是设置页）。两套目录：
 
+![MCP 市场：左栏入口 + 内置社区目录 300 条](assets/screenshots/mcp-market-local.png)
+
 - **本地目录**（默认）：随插件离线分发的社区目录 300 条，含分类筛选与全文搜索，**不联网**也能用。
 - **官方 Registry**：实时拉取 `registry.modelcontextprotocol.io`，游标翻页、按关键词搜索。
+
+![官方 Registry：实时目录 + 游标翻页](assets/screenshots/mcp-market-registry.png)
 
 安装流程：
 
@@ -111,6 +115,12 @@ dsh plugin add ./packages/mcp-market-panel   # 左栏「MCP 市场」
 - **传输门**：DSH 的 MCP 客户端只支持 `stdio` 与 `streamable-http`，`sse`-only 的条目会被
   明确标为不支持而不是悄悄装坏。
 - 卡片上的状态点由**实际注册的工具数**推导：绿=已连接、红=已启用但没有工具、灰=已停用。
+
+![安装窗：必填凭据未填时阻止安装，并展示将写入的配置](assets/screenshots/mcp-market-install.png)
+
+深色主题跟随宿主 token：
+
+![深色主题下的 MCP 市场](assets/screenshots/mcp-market-dark.png)
 
 > 市场面板不自己实现持久化：安装走 `mcp-panel` 的 `mcpAdmin` 远端，因此必须同时安装
 > `mcp-panel`。它缺席时面板照常渲染，安装按钮给出降级说明。

@@ -269,6 +269,25 @@ check('local names still satisfy the host serverName pattern', () => {
   }
 })
 
+// ---------------------------------------------------------------- prose hygiene
+
+const { plainText } = await import('./.tmp-build/client/registry.js')
+
+check('markdown link syntax is flattened out of catalog prose', () => {
+  assert.equal(
+    plainText('A [Model Context Protocol](https://modelcontextprotocol.io/) server for [Axiom](https://axiom.co).'),
+    'A Model Context Protocol server for Axiom.',
+  )
+  assert.equal(plainText('see ![logo](x.png) here'), 'see logo here')
+  assert.equal(plainText('no markup here'), 'no markup here')
+})
+check('no bundled local description still carries markdown links', () => {
+  const offenders = LOCAL_SERVERS
+    .filter(one => /\[[^\]]*\]\([^)]*\)/.test(one.description) || /\[[^\]]*\]\([^)]*\)/.test(one.title))
+    .map(one => one.name)
+  assert.deepEqual(offenders, [])
+})
+
 // ------------------------------------------------- mirror drift guard
 // The market keeps its own copy of the MCP config shapes, because a sibling panel's
 // types resolve through gitignored lib/ and would break a fresh clone. These checks

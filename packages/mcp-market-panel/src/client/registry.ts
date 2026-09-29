@@ -221,6 +221,24 @@ function fromRemote(raw: unknown, serverVersion: string): InstallCandidate {
   return candidate
 }
 
+/**
+ * Flatten markdown link syntax out of catalog prose.
+ *
+ * Descriptions are third-party text and the cards render them as plain React text
+ * (never HTML), which is the safe choice but leaves `[Model Context Protocol](https://…)`
+ * visible on screen — upstream catalogs do write markdown there. Unwrapping to the
+ * label keeps the sentence readable without introducing a renderer into a clamped card.
+ *
+ * @param value - raw catalog prose.
+ * @returns the same prose with link markup reduced to its label.
+ */
+export function plainText(value: string): string {
+  return value
+    .replace(/!?\[([^\]]*)\]\([^)\s]*\)/g, '$1')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+}
+
 /** Normalize one `{ server, _meta }` envelope into a catalog row. */
 export function toMarketServer(envelope: unknown): MarketServer | undefined {
   const wrapper = asRecord(envelope)
@@ -228,8 +246,8 @@ export function toMarketServer(envelope: unknown): MarketServer | undefined {
   const name = asString(source.name)
   if (name === undefined) return undefined
   const version = asString(source.version) ?? '0.0.0'
-  const description = asString(source.description) ?? ''
-  const title = asString(source.title) ?? name
+  const description = plainText(asString(source.description) ?? '')
+  const title = plainText(asString(source.title) ?? name)
   const candidates = [
     ...asList(source.remotes).map(remote => fromRemote(remote, version)),
     ...asList(source.packages).map(pkg => fromPackage(pkg, version)),
