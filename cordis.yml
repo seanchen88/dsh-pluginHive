@@ -5,5 +5,7 @@
     name: '@dsh-plugins/mcp-panel'
   - id: skill-panel
     name: '@dsh-plugins/skill-panel'
+  - id: market-panel
+    name: '@dsh-plugins/mcp-market-panel'
   - id: example-panel
     name: '@dsh-plugins/example-panel'

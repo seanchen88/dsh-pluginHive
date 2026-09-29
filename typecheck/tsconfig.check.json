@@ -22,6 +22,8 @@
     "../packages/mcp-panel/src/**/*.tsx",
     "../packages/skill-panel/src/**/*.ts",
     "../packages/skill-panel/src/**/*.tsx",
+    "../packages/mcp-market-panel/src/**/*.ts",
+    "../packages/mcp-market-panel/src/**/*.tsx",
     "../packages/example-panel/src/**/*.ts",
     "../packages/example-panel/src/**/*.tsx"
   ],

@@ -1,0 +1,8 @@
+# Bundle patch layer contributed when @dsh-plugins/mcp-market-panel is installed.
+# The browser half is discovered from this package's `dsh.client` declaration.
+#
+# Row id deliberately omits the `mcp-` prefix: the MCP panel names its server rows
+# `mcp-<serverName>`, so `market-panel` can never collide with a user's server row.
+- insert:
+    - id: market-panel
+      name: '@dsh-plugins/mcp-market-panel'

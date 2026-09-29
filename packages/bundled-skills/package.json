@@ -1,6 +1,6 @@
 {
   "name": "@dsh-plugins/bundled-skills",
-  "description": "Skills shipped with the DeepSeek Harness plugin set (single source of truth for panel-bootstrapped skills such as create-skill).",
+  "description": "Agent Skills shipped with dsh-pluginHive, bootstrapped into the user's skills directory by the skill panel.",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -27,5 +27,22 @@
     "lib/index.js",
     "lib/index.d.ts",
     "skills/**/*"
+  ],
+  "author": "seanchen88",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanchen88/dsh-pluginHive.git",
+    "directory": "packages/bundled-skills"
+  },
+  "bugs": {
+    "url": "https://github.com/seanchen88/dsh-pluginHive/issues"
+  },
+  "homepage": "https://github.com/seanchen88/dsh-pluginHive#readme",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "cordis",
+    "plugin",
+    "agent-skill"
   ]
 }

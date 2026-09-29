@@ -1,0 +1,193 @@
+/*
+ * MCP market panel layout.
+ *
+ * 两条硬规则：
+ *  1. 颜色只用宿主**真实定义**的 `--dsw-alias-*` token（对不上就是深色模式跑偏，
+ *     详见 plugin-kit/src/ui.module.css 顶部注释）。
+ *  2. 宽度靠「外层滚动 + 内层定宽居中」两层的结构拿：直接把 max-width 放在滚动元素上，
+ *     父级 `centerCol` 是 flex 容器、再上面是 `display: contents`，宽度会随内容走，
+ *     卡片就会一路摊到主列右边缘。
+ */
+
+.page {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  color: var(--dsw-alias-label-primary, #1a1a1a);
+}
+
+.inner {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.headRow { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.heading { margin: 0; font-size: 22px; font-weight: 650; color: var(--dsw-alias-label-primary, #1a1a1a); }
+.intro { margin: 0; font-size: 13px; line-height: 1.6; color: var(--dsw-alias-label-secondary, #666); }
+
+.toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.search { box-sizing: border-box; flex: 1 1 260px; min-width: 200px; }
+.filters { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dsw-alias-label-secondary, #666); }
+.category { box-sizing: border-box; width: auto; min-width: 128px; flex: 0 0 auto; }
+.status { font-size: 12px; color: var(--dsw-alias-label-tertiary, #888); white-space: nowrap; }
+.statusRow { display: flex; align-items: center; gap: 8px; justify-content: center; padding: 14px 0; font-size: 13px; color: var(--dsw-alias-label-secondary, #666); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(288px, 1fr)); gap: 12px; align-items: start; }
+
+.card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--dsw-alias-border-l1, #e6e6e6);
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-layer-1, #ffffff);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.card:hover { border-color: var(--dsw-alias-border-l2, #d6d6d6); background: var(--dsw-alias-bg-layer-2, #fafafa); }
+.cardTitle { font-size: 15px; font-weight: 600; color: var(--dsw-alias-label-primary, #1a1a1a); word-break: break-word; }
+.cardDesc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--dsw-alias-label-secondary, #666);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cardMeta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; color: var(--dsw-alias-label-tertiary, #888); word-break: break-all; }
+.cardActions { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 2px; }
+
+.tagInstalled { color: var(--dsw-alias-state-success-primary, #12805c); }
+.tagUnsupported { color: var(--dsw-alias-state-warn-primary, #a15c00); }
+.tagDeprecated { color: var(--dsw-alias-state-error-primary, #b3261e); }
+.tagOfficial { color: var(--dsw-alias-brand-text, #2b6cb0); }
+
+/* 连接状态：绿=拉到工具，红=已启用但零工具，灰=已停用。只能由实际注册的工具数推导，
+   不能用 enabled 推导——命令起不来的服务会永远 enabled。 */
+.statusDot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--dsw-alias-border-l3, #bbb); }
+.statusDot[data-state='connected'] { background: var(--dsw-alias-state-success-primary, #2f9e57); }
+.statusDot[data-state='failed'] { background: var(--dsw-alias-state-error-primary, #c0392b); }
+.statusDot[data-state='disabled'] { background: var(--dsw-alias-border-l3, #bbb); }
+.statusText { font-size: 12px; color: var(--dsw-alias-label-tertiary, #888); white-space: nowrap; }
+.statusText[data-state='connected'] { color: var(--dsw-alias-state-success-primary, #2f9e57); }
+.statusText[data-state='failed'] { color: var(--dsw-alias-state-error-primary, #c0392b); }
+
+.detailBlock { display: flex; flex-direction: column; gap: 6px; margin: 0; min-width: 0; }
+.detailRow { display: flex; gap: 8px; font-size: 13px; min-width: 0; }
+.detailKey { flex: 0 0 92px; color: var(--dsw-alias-label-secondary, #666); }
+.detailValue { flex: 1 1 auto; min-width: 0; color: var(--dsw-alias-label-primary, #1a1a1a); word-break: break-all; }
+.link { color: var(--dsw-alias-link, #2b6cb0); text-decoration: none; word-break: break-all; }
+.link:hover { text-decoration: underline; }
+
+.variable { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.variableLabel { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--dsw-alias-label-primary, #1a1a1a); }
+.variableHint { font-size: 12px; color: var(--dsw-alias-label-secondary, #666); font-weight: 400; }
+.field { box-sizing: border-box; width: 100%; }
+
+.sectionTitle { margin: 4px 0; font-size: 13px; font-weight: 650; color: var(--dsw-alias-label-primary, #1a1a1a); }
+
+/* 预览块：`.modalBody > *` 的 flex: 0 0 auto 由 plugin-kit 负责，这里只管高度与滚动。 */
+.preview {
+  box-sizing: border-box;
+  width: 100%;
+  max-height: 240px;
+  margin: 0;
+  padding: 10px 12px;
+  overflow: auto;
+  border: 1px solid var(--dsw-alias-border-l1, #e6e6e6);
+  border-radius: 8px;
+  background: var(--dsw-alias-markdown-code-block, #f6f6f6);
+  color: var(--dsw-alias-label-primary, #1a1a1a);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.banner {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--dsw-alias-border-l1, #e6e6e6);
+  background: var(--dsw-alias-bg-layer-1, #f6f6f6);
+  color: var(--dsw-alias-label-primary, #1a1a1a);
+}
+.bannerError { border-color: var(--dsw-alias-state-error-secondary, #e0b4ae); background: var(--dsw-alias-bg-layer-1, #fdf2f1); color: var(--dsw-alias-state-error-primary, #b3261e); }
+.bannerWarn { border-color: var(--dsw-alias-state-warn-secondary, #e8d4ae); background: var(--dsw-alias-bg-layer-1, #fdf8ef); color: var(--dsw-alias-state-warn-primary, #a15c00); }
+
+.navIcon { display: block; color: currentColor; }
+
+/* 安装进行中：写入本身可能要几十秒（npx 下载、重连退避），必须有明确进度提示。 */
+.busyRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid var(--dsw-alias-border-l1, #e6e6e6);
+  background: var(--dsw-alias-bg-layer-1, #f6f6f6);
+  color: var(--dsw-alias-label-secondary, #666);
+}
+
+/* 结果弹窗：安装结束后自动关闭安装窗，由这一层给出成功/失败与是否连上。 */
+.resultBody { display: flex; flex-direction: column; gap: 10px; }
+.resultLine { display: flex; gap: 8px; align-items: baseline; font-size: 13px; }
+.resultKey { flex: 0 0 84px; color: var(--dsw-alias-label-secondary, #666); }
+.resultValue { flex: 1 1 auto; min-width: 0; color: var(--dsw-alias-label-primary, #1a1a1a); word-break: break-all; }
+.resultOk { color: var(--dsw-alias-state-success-primary, #2f9e57); font-weight: 600; }
+.resultBad { color: var(--dsw-alias-state-error-primary, #c0392b); font-weight: 600; }
+
+/*
+ * 加载态：骨架屏而不是「转圈 + 一句话」。用宿主的 bg-skeleton token，
+ * 高光扫过走 label-shimmer，深浅色都跟着主题走。
+ */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-skeleton, rgba(0, 0, 0, 0.06));
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--dsw-alias-label-shimmer, rgba(255, 255, 255, 0.45)) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: dshshimmer 1.4s ease-in-out infinite;
+}
+@keyframes dshshimmer { 100% { transform: translateX(100%); } }
+
+.skeletonCard {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--dsw-alias-border-l1, #ececec);
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-layer-1, #ffffff);
+}
+.skTitle { height: 16px; width: 55%; }
+.skLine { height: 11px; width: 100%; }
+.skLineShort { height: 11px; width: 72%; }
+.skMeta { height: 10px; width: 40%; }
+.skActions { display: flex; gap: 8px; margin-top: 2px; }
+.skButton { height: 30px; width: 74px; border-radius: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after { animation: none; }
+}

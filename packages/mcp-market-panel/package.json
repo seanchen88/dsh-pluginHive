@@ -1,6 +1,6 @@
 {
-  "name": "@dsh-plugins/example-panel",
-  "description": "Copy-me template for building a new DeepSeek Harness management panel on top of plugin-kit.",
+  "name": "@dsh-plugins/mcp-market-panel",
+  "description": "MCP marketplace panel for DeepSeek Harness: browse and search the official MCP Registry, then install a server into the current profile through the MCP services panel's write path.",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -27,7 +27,10 @@
       "inject": [
         "@deepseek-ai/dsh-client-locale",
         "@deepseek-ai/dsh-client-ui-settings",
-        "@deepseek-ai/dsh-client-ui-renderer"
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-api-remotes"
       ]
     }
   },
@@ -54,21 +57,5 @@
     "lib/types/**/*.js",
     "lib/types/**/*.d.ts",
     "cordis.patch.yml"
-  ],
-  "author": "seanchen88",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/seanchen88/dsh-pluginHive.git",
-    "directory": "packages/example-panel"
-  },
-  "bugs": {
-    "url": "https://github.com/seanchen88/dsh-pluginHive/issues"
-  },
-  "homepage": "https://github.com/seanchen88/dsh-pluginHive#readme",
-  "keywords": [
-    "deepseek-harness",
-    "dsh",
-    "cordis",
-    "plugin"
   ]
 }

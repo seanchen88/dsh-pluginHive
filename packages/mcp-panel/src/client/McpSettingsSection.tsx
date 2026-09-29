@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, EmptyState, Spacer, Tabs } from '@dsh-plugins/plugin-kit'
+import { Button, EmptyState, settleWrite, Spacer, Tabs } from '@dsh-plugins/plugin-kit'
 import type { McpServerConfig, McpServerView, McpWriteResult } from '../types.ts'
 import type { McpInjected, Translate } from './injected.ts'
 import { McpCard } from './McpCard.tsx'
@@ -8,42 +8,11 @@ import css from './panel.module.css'
 
 export type McpSettingsSectionProps = { t: Translate } & McpInjected
 
-/** How long to wait for a write's reply before trusting a fresh list instead. */
-const WRITE_SETTLE_MS = 20_000
+/** Grace period before a zero-tool server is called failed rather than still starting. */
+const CONNECT_GRACE_MS = 4000
 
-type Settled =
-  | { status: 'ok'; value: McpWriteResult }
-  | { status: 'error'; error: string }
-  | { status: 'timeout' }
-
-/**
- * Await a write without ever hanging the panel.
- *
- * A write that changes the profile patch makes HMR recompute the composition, and the
- * host fiber serving the call can be reloaded before its reply is sent — the patch is
- * already on disk while the promise never settles. Neither outcome may leave 「保存」
- * stuck disabled, so a lost reply degrades into a refetch.
- *
- * @param call - the in-flight write.
- * @param ms - settle budget before giving up on the reply.
- */
-async function settleWrite(call: Promise<McpWriteResult>, ms: number): Promise<Settled> {
-  let timer: ReturnType<typeof setTimeout> | undefined
-  const normalized: Promise<Settled> = call.then(
-    (value): Settled => ({ status: 'ok', value }),
-    (error: unknown): Settled => ({
-      status: 'error',
-      error: error instanceof Error ? error.message : String(error),
-    }),
-  )
-  const guard = new Promise<Settled>(resolve => {
-    timer = setTimeout(() => { resolve({ status: 'timeout' }) }, ms)
-  })
-  try {
-    return await Promise.race([normalized, guard])
-  } finally {
-    if (timer !== undefined) clearTimeout(timer)
-  }
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => { setTimeout(resolve, ms) })
 }
 
 function PlusIcon() {
@@ -58,8 +27,57 @@ export function McpSettingsSection(props: McpSettingsSectionProps) {
   const [banner, setBanner] = useState<string | undefined>(undefined)
   const [scopeId, setScopeId] = useState<string>('user')
   const [editing, setEditing] = useState<{ open: boolean; initial?: McpServerConfig }>({ open: false })
+  /** Live tool count per server name; absent while still being probed. */
+  const [toolCounts, setToolCounts] = useState<Record<string, number>>({})
+  /** Server whose enable/disable write has not settled; its card shows progress. */
+  const [pendingToggle, setPendingToggle] = useState<string | undefined>(undefined)
 
   const tabs = useMemo(() => scopes().map(scope => ({ id: scope.id, label: scope.label })), [scopes])
+
+  const probeTools = useCallback(async (targets: readonly McpServerView[]): Promise<Record<string, number>> => {
+    const out: Record<string, number> = {}
+    await Promise.all(targets.map(async server => {
+      try { out[server.serverName] = (await getTools(server.serverName)).length }
+      catch { out[server.serverName] = 0 }
+    }))
+    return out
+  }, [getTools])
+
+  /**
+   * Derive connection health from the tools the server actually registered.
+   *
+   * `enabled` only means the row is not switched off — a server whose command fails to
+   * start stays enabled forever, which is why the status dot used to read green for
+   * broken servers. A server still handshaking is indistinguishable from a dead one for
+   * a few seconds, so zero-tool rows get exactly one re-probe before being called failed.
+   */
+  useEffect(() => {
+    const enabled = servers.filter(server => server.enabled)
+    if (enabled.length === 0) { setToolCounts({}); return }
+    let cancelled = false
+    void (async () => {
+      const watched = new Set(enabled.map(server => server.serverName))
+      // Clear first: a re-enabled server must not inherit the count from its previous
+      // generation, which would show a stale 「已连接」 until the new probe lands.
+      setToolCounts(previous => Object.fromEntries(
+        Object.entries(previous).filter(([name]) => !watched.has(name)),
+      ))
+      const first = await probeTools(enabled)
+      if (cancelled) return
+      // Only a non-zero answer is final. Zero is still ambiguous (starting vs broken),
+      // so those rows stay 「检测中」 until the grace re-probe settles them.
+      setToolCounts(previous => ({
+        ...previous,
+        ...Object.fromEntries(Object.entries(first).filter(([, count]) => count > 0)),
+      }))
+      const quiet = enabled.filter(server => (first[server.serverName] ?? 0) === 0)
+      if (quiet.length === 0) return
+      await sleep(CONNECT_GRACE_MS)
+      const again = await probeTools(quiet)
+      if (!cancelled) setToolCounts(previous => ({ ...previous, ...again }))
+    })()
+    return () => { cancelled = true }
+  }, [servers, probeTools])
 
   const reload = useCallback(async () => {
     try {
@@ -85,7 +103,7 @@ export function McpSettingsSection(props: McpSettingsSectionProps) {
    * reconcile may have orphaned — fall back to the authoritative list instead.
    */
   const runWrite = useCallback(async (call: Promise<McpWriteResult>) => {
-    const settled = await settleWrite(call, WRITE_SETTLE_MS)
+    const settled = await settleWrite(call)
     if (settled.status === 'ok') { applyWrite(settled.value); return undefined }
     if (settled.status === 'error') { setError(settled.error); return undefined }
     await reload()
@@ -99,7 +117,15 @@ export function McpSettingsSection(props: McpSettingsSectionProps) {
   }, [upsert, runWrite])
 
   const onToggle = useCallback(async (server: McpServerView, enabled: boolean) => {
-    await runWrite(setEnabled(server.serverName, enabled))
+    // Enabling goes through a profile reconcile that can take seconds and may reload
+    // the fiber answering the call, so the switch would otherwise sit there looking
+    // unresponsive right after the click.
+    setPendingToggle(server.serverName)
+    try {
+      await runWrite(setEnabled(server.serverName, enabled))
+    } finally {
+      setPendingToggle(undefined)
+    }
   }, [setEnabled, runWrite])
 
   const onTimeout = useCallback(async (server: McpServerView, ms: number) => {
@@ -139,6 +165,8 @@ export function McpSettingsSection(props: McpSettingsSectionProps) {
             server={server}
             t={t}
             getTools={getTools}
+            toolCount={toolCounts[server.serverName]}
+            busy={pendingToggle === server.serverName}
             onToggle={(enabled) => { void onToggle(server, enabled) }}
             onEdit={() => { setEditing({ open: true, initial: server.config }) }}
             onDelete={() => { void onDelete(server) }}

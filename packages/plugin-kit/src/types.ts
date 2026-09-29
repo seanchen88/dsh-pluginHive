@@ -26,12 +26,20 @@ export interface InjectFaceReturn {
   [member: string]: unknown
 }
 
-/** Options accepted by `ctx.slots.register` for a `settings.section` entry. */
+/** Options accepted by `ctx.slots.register` for a contributed panel entry. */
 export interface PanelRegistration {
   /** The owner slot key being contributed to, e.g. `settings.section`. */
   readonly name: string
-  /** Stable list-slot id; unique within the owner slot. */
-  readonly id: string
+  /**
+   * Stable list-slot id; unique within the owner slot. Required for `kind: 'list'`
+   * slots (`settings.section`, `sidebar.panellist`).
+   */
+  readonly id?: string
+  /**
+   * Address of a `kind: 'keyed'` slot entry, e.g. the `main` panel column. Mutually
+   * exclusive with `id`: keyed owners resolve by `key`, list owners by `id`.
+   */
+  readonly key?: string
   /** Ascending render order among sibling entries. */
   readonly order?: number
   /** Navigation label shown by the owner. */

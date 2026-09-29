@@ -8,5 +8,7 @@ packages:
 # unpublished internal package. Install deliberately instead of implicitly.
 verifyDepsBeforeRun: false
 autoInstallPeers: false
+# tsdown runs on rolldown, whose platform binary needs its install script to run.
+# pnpm writes the literal placeholder below when it prompts; it must be a boolean.
 allowBuilds:
-  rolldown: set this to true or false
+  rolldown: true

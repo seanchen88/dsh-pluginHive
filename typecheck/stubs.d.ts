@@ -88,6 +88,15 @@ declare module '@deepseek-ai/dsh-client-locale/client' {}
 declare module '@deepseek-ai/dsh-client-ui-settings/client' {}
 declare module '@deepseek-ai/dsh-client-ui-renderer/client' {}
 declare module '@deepseek-ai/dsh-api-remotes/client' {}
+declare module '@deepseek-ai/dsh-client-ui-sidebar/client' {}
+// The market panel addresses the keyed `main` slot, so it needs the real branded
+// id type to exist; the stub reproduces `ui-layout`'s `Branded<'MainPanelId'>`
+// shape closely enough for the offline check (the live build resolves the
+// package's own `client` types instead).
+declare module '@deepseek-ai/dsh-client-ui-layout/client' {
+  export type MainPanelId = string & { readonly __brand: 'MainPanelId' }
+  export interface PanelInfo { readonly activePanelId: MainPanelId | null }
+}
 // Context-augmentation faces the host controllers pull in type-only (the real
 // packages merge their service onto Context; here the stub Context already
 // carries them via its index signature, so an empty module is enough to resolve).

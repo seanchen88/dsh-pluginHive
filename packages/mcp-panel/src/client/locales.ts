@@ -3,7 +3,7 @@
 export type McpLocaleKey =
   | 'nav' | 'title' | 'intro' | 'docs' | 'add'
   | 'scope.user' | 'empty'
-  | 'tools' | 'tools.none' | 'timeout' | 'enabled' | 'disabled'
+  | 'tools' | 'tools.none' | 'tools.loading' | 'tools.emptyNow' | 'timeout' | 'enabled' | 'disabled'
   | 'fromPlugin' | 'edit' | 'delete' | 'delete.confirm'
   | 'restartRequired' | 'transport' | 'transport.stdio' | 'transport.http'
   | 'url' | 'command' | 'args' | 'env' | 'serverName' | 'save' | 'cancel'
@@ -11,6 +11,7 @@ export type McpLocaleKey =
   | 'secrets.stored'
   | 'modal.close'
   | 'load.error'
+  | 'status.connected' | 'status.failed' | 'status.probing' | 'status.disabled' | 'status.applying'
 
 export const en: Record<McpLocaleKey, string> = {
   nav: 'MCP Servers',
@@ -22,6 +23,8 @@ export const en: Record<McpLocaleKey, string> = {
   empty: 'No MCP servers configured yet.',
   tools: 'Tools',
   'tools.none': 'No tools loaded — the server may not be connected yet.',
+  'tools.loading': 'Loading tools… the server is starting, syncing, or reconnecting.',
+  'tools.emptyNow': 'No tools yet — the server is up but has not registered any. Reopen after a moment.',
   timeout: 'Request timeout',
   enabled: 'Enabled',
   disabled: 'Disabled',
@@ -48,6 +51,11 @@ export const en: Record<McpLocaleKey, string> = {
   'form.pairsHint': 'one KEY=value per line',
   'secrets.stored': 'Values are stored in plain text in the profile patch file.',
   'load.error': 'Failed to load MCP servers.',
+  'status.connected': '{n} tools',
+  'status.failed': 'Not connected',
+  'status.probing': 'Checking…',
+  'status.disabled': 'Disabled',
+  'status.applying': 'Applying…',
 }
 
 export const zh: Record<McpLocaleKey, string> = {
@@ -60,6 +68,8 @@ export const zh: Record<McpLocaleKey, string> = {
   empty: '尚未配置任何 MCP 服务。',
   tools: '工具',
   'tools.none': '未加载工具 —— 服务可能尚未连接。',
+  'tools.loading': '正在加载工具… 服务在启动、握手或重连中。',
+  'tools.emptyNow': '暂无工具 —— 服务已连接但没有注册任何工具，稍等后重新展开查看。',
   timeout: '请求超时时长',
   enabled: '已启用',
   disabled: '已停用',
@@ -86,4 +96,9 @@ export const zh: Record<McpLocaleKey, string> = {
   'form.pairsHint': '每行一个 KEY=value',
   'secrets.stored': '这些值以明文保存在 profile 的补丁文件中。',
   'load.error': '加载 MCP 服务失败。',
+  'status.connected': '{n} 个工具',
+  'status.failed': '未连接',
+  'status.probing': '检测中…',
+  'status.disabled': '已停用',
+  'status.applying': '正在生效…',
 }

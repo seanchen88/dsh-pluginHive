@@ -20,8 +20,14 @@ export interface MarkdownProps {
 
 const INLINE_TOKEN = /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*]+\*)|(\[[^\]]+\]\([^)\s]+\))/g
 
-/** Only web links navigate; anything else (javascript:, data:) is inert. */
-function safeHref(url: string): string {
+/**
+ * Only web links navigate; anything else (javascript:, data:) is inert.
+ * Exported because panels render third-party URLs outside of markdown too
+ * (catalog metadata, skill frontmatter) and the rule must not be re-implemented.
+ * @param url - the candidate href.
+ * @returns the url when it is http(s), otherwise an empty string.
+ */
+export function safeHref(url: string): string {
   return /^https?:\/\//i.test(url) ? url : ''
 }
 

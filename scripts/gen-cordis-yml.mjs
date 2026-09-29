@@ -26,6 +26,9 @@ const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)))
 const PANELS = [
   { id: 'mcp-panel', pkg: '@dsh-plugins/mcp-panel' },
   { id: 'skill-panel', pkg: '@dsh-plugins/skill-panel' },
+  // Sidebar entry below 「插件」; installs delegate to the mcp-panel write path,
+  // so keep it after mcp-panel in the list to preserve load order.
+  { id: 'market-panel', pkg: '@dsh-plugins/mcp-market-panel' },
   // The copy-me template; comment out to omit the demo section.
   { id: 'example-panel', pkg: '@dsh-plugins/example-panel' },
 ]

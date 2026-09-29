@@ -1,6 +1,6 @@
 {
   "name": "@dsh-plugins/mcp-panel",
-  "description": "DeepSeek Harness plugin: MCP service management panel (settings section + mcpAdmin Remote + profile-patch writer).",
+  "description": "MCP services management panel for DeepSeek Harness: list, add, edit, enable/disable and delete MCP servers through the profile patch layer.",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -81,5 +81,22 @@
     "cordis.patch.yml",
     "lib/typert.host.d.ts",
     "lib/typert.remote-client.d.ts"
+  ],
+  "author": "seanchen88",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanchen88/dsh-pluginHive.git",
+    "directory": "packages/mcp-panel"
+  },
+  "bugs": {
+    "url": "https://github.com/seanchen88/dsh-pluginHive/issues"
+  },
+  "homepage": "https://github.com/seanchen88/dsh-pluginHive#readme",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "cordis",
+    "plugin",
+    "mcp"
   ]
 }

@@ -97,6 +97,18 @@ pnpm dsh web
 | Markdown 段落要**先折叠软换行、再走一次行内解析** | 手工折行的中文 markdown 里 `**粗体**` 经常跨行，逐行解析则两边都配不上对 → 屏幕上漏出字面 `**` |
 | 删除类确认文案必须**指名对象**（`{name}` 占位符） | 多行同构卡片时，泛化的"确定删除该服务？"极易点错行造成用户数据丢失（已真实发生过一次） |
 | 自动化测试里定位列表行时，**不能**靠"向上找包含目标名的祖先" | 列表容器的 `innerText` 包含**所有**行名，会匹到第一行——必须用"含目标名 且 不含其它行名 且 只有一个操作按钮"的最小祖先 |
+| 表单控件必须自己写 `box-sizing: border-box` | 宿主对插件元素是 **content-box**（它的 preflight 在 `@layer base`/`@scope` 里，盖不到我们），`.field` 的 column-flex stretch 把子项拉到容器宽，`padding`/`border` 再叠上去 → 输入框贴出弹窗右边缘并顶出横向滚动条 |
+| **CSS 里的 `--dsw-alias-*` 名字必须能在 harness 里 grep 到** | 不存在的 token 会让 `var(x, 兜底)` 静默退到硬编码浅色值，深色模式整块面板跑偏且**不报任何错**。宿主真实词表：`label-{primary,secondary,tertiary}` / `bg-{base,layer-1..3,skeleton,overlay}` / `border-l1..l4` / `brand-{primary,text}` / `state-{error,warn,success}-primary` / `button-{primary,floating,tool-bar}-fill` / `switch-thumb` / `tooltip-bg` / `link`。动手前先跑 `grep -rhoE "\-\-dsw-alias-[a-z0-9-]+:" <harness>/packages/client \| sort -u`；**`.tsx` 里的内联 style 也要扫**，那里同样会写死 token |
+| 需要关设置弹层时，用 `settings.section` 的 **owner prop** `close()` | 宿主 `renderSlot('settings.section', { close: onClose }, …)` 一直在传。接宿主能力前先查 `packages/client/ui-settings/src/client/contract/slots.ts` 的 owner 类型，别凭印象绕路 |
+| 左栏入口必须**成对注册**：`sidebar.panellist`（list 槽，用 `id`）+ `main`（keyed 槽，用 `key`），两者字符串相同；并在 `dsh.client.inject` 声明 `dsh-client-ui-sidebar` / `dsh-client-ui-layout` | 只注册 nav 行 → 点击时宿主 `layout.selectPanel` 抛 `main panel "x" is not registered`。「插件」行本身也是槽贡献（`order:0`），位置由 `order` 决定：1..9 落在插件之下、工作区区域之上 |
+| 常驻弹窗的播种 effect **不得**把「实时派生数据」列进依赖数组 | 写操作成功后刷新出来的新引用会让 effect 重跑 → 弹窗跳回第一步并把结果文案擦掉。播种只依赖 `open` / 目标对象 / 模式，实时值走 ref |
+| 复用别的面板已有的 Remote 命名空间时，一律 `ctx.get('remote.<ns>')` 软访问 + 按钮降级，**不要**再写第二份持久化 | 两个面板各写 patch 会让锁 / 回滚 / reconcile 行为分叉；市场面板因此**完全没有** `@Remote`（也就无需 typert） |
+| 会把第三方代码拉起来执行的入口（装 MCP = 跑 `npx`/`uvx`/`docker`），确认窗必须展示**将执行的完整命令与将写入的完整配置**，必填凭据未填要阻止而非放行 | 供应链风险被藏在一个按钮后；且 DSH 不展开 `${VAR}`，带着占位符装出去只会得到一个连不上的坏服务 |
+| **stdio 行必须写一个存在的 `cwd`** | 宿主 `mcp-client` 的 zod 把 `cwd` 默认成 `''`，而 `spawn(..., {cwd:''})` 直接 **ENOENT** → 服务永远起不来，日志里刷 `sh: <bin>: command not found`。表单留空是常态，所以在**宿主半** `upsert` 里补 `homedir()`（`mcp-panel/src/index.ts` 的 `withStdioCwd`），两个面板一起受益 |
+| 连接状态只能由**实际注册的工具数**推导，不能由 `enabled` 推导 | 命令起不来的服务会**永远 enabled** → 状态点一路绿色。三态：`tools>0` 绿 / `enabled && tools===0` 红 / `!enabled` 灰；探针留 4s 宽限期再判红，否则把还在握手的服务误判成失败。启停写入本身要 3–5 秒（走 reconcile），必须同时给「正在生效…」进度并禁用开关 |
+| 第三方目录里的 `${...}` 占位符必须**宽松识别**（`[^{}]+`）并保证一个都不写进配置 | 社区目录里同时有 `api-key`、`your-secret-api-key`、`input:organization_id` 甚至 `-s`；按标识符匹配会漏，漏掉的原样进 profile 变成坏服务 |
+| 从别的许可协议的项目里灌数据，**出处与许可证要写在产物里** | 本仓库 MIT；市场面板的内置目录源自 MCP Hub（Apache-2.0）vendored 的 MCPM 社区目录。归因见 `THIRD_PARTY_LICENSES.md` 与生成文件头部，重新生成时不要丢 |
+| JSX 只能写在 `.tsx` 里 | 把 SVG 组件塞进 `client/index.ts` 会让 `tsc` 吐一串 `TS1005 '>' expected`，像语法被 parser 吃掉，其实只是文件后缀不对 |
 
 ## 新增一个面板
 

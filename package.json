@@ -19,11 +19,13 @@
     "watch": "pnpm -r --parallel run watch",
     "typecheck": "tsc -p typecheck/tsconfig.check.json",
     "test:zip": "tsc packages/skill-panel/src/zip-import.ts packages/skill-panel/src/types.ts --outDir packages/skill-panel/.tmp-build --rootDir packages/skill-panel/src --module esnext --moduleResolution bundler --target es2022 --allowImportingTsExtensions --rewriteRelativeImportExtensions --skipLibCheck && node packages/skill-panel/test-zip-import.mjs",
-    "verify": "pnpm run typecheck && pnpm run test:zip",
+    "verify": "pnpm run typecheck && pnpm run test:zip && pnpm run test:market",
     "clean": "rm -rf packages/*/lib packages/*/tsconfig.tsbuildinfo",
     "dev:web": "pnpm run build && HERE=\"$PWD\" && cd \"${DSH_REPO:-../deepseek-harness}\" && pnpm dsh web --patch \"$HERE/cordis.yml\"",
     "setup:harness": "node scripts/link-harness.mjs",
-    "gen:typert": "node scripts/typert-last-mile.mjs"
+    "gen:typert": "node scripts/typert-last-mile.mjs",
+    "gen:catalog": "node scripts/gen-local-catalog.mjs",
+    "test:market": "tsc packages/mcp-market-panel/src/client/to-config.ts packages/mcp-market-panel/src/client/slug.ts packages/mcp-market-panel/src/client/registry.ts packages/mcp-market-panel/src/client/local-catalog.ts --outDir packages/mcp-market-panel/.tmp-build --rootDir packages/mcp-market-panel/src --module esnext --moduleResolution bundler --target es2022 --strict --allowImportingTsExtensions --rewriteRelativeImportExtensions --skipLibCheck && node packages/mcp-market-panel/test-market-mapping.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
@@ -33,5 +35,24 @@
     "react-dom": "^18.2.0",
     "tsdown": "^0.9.0",
     "typescript": "^5.7.0"
-  }
+  },
+  "author": "seanchen88",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanchen88/dsh-pluginHive.git",
+    "directory": "."
+  },
+  "bugs": {
+    "url": "https://github.com/seanchen88/dsh-pluginHive/issues"
+  },
+  "homepage": "https://github.com/seanchen88/dsh-pluginHive#readme",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "cordis",
+    "plugin",
+    "mcp",
+    "agent-skill",
+    "model-context-protocol"
+  ]
 }

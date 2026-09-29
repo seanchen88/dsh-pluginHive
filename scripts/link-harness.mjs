@@ -18,12 +18,33 @@
  *
  *   DSH_REPO=/path/to/deepseek-harness pnpm setup:harness
  */
-import { existsSync, lstatSync, mkdirSync, readFileSync, rmSync, symlinkSync } from 'node:fs'
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const harness = resolve(process.env.DSH_REPO ?? join(repoRoot, '..', 'deepseek-harness'))
+
+/**
+ * Locate the harness checkout. `DSH_REPO` wins; otherwise the sibling layouts
+ * both used in practice are probed, so a fresh clone works without env setup.
+ */
+function findHarness() {
+  const candidates = process.env.DSH_REPO !== undefined
+    ? [process.env.DSH_REPO]
+    : [join(repoRoot, '..', 'deepseek-harness'), join(repoRoot, '..', '..', 'deepseek-harness')]
+  for (const candidate of candidates) {
+    const abs = resolve(repoRoot, candidate)
+    if (existsSync(join(abs, 'package.json'))) return abs
+  }
+  throw new Error(
+    `Harness checkout not found. Looked in:\n` +
+    candidates.map(candidate => `  ${resolve(repoRoot, candidate)}`).join('\n') + '\n\n' +
+    'Clone DeepSeek Harness and point DSH_REPO at it, e.g.\n' +
+    '  DSH_REPO=/path/to/deepseek-harness pnpm setup:harness\n',
+  )
+}
+
+const harness = findHarness()
 
 /**
  * Package name tail -> directory inside the harness checkout. Kept explicit on
@@ -41,15 +62,10 @@ const HARNESS_PATHS = {
   'dsh-typert-protocol': 'packages/typert/protocol',
 }
 
-if (!existsSync(join(harness, 'package.json'))) {
-  throw new Error(
-    `Harness checkout not found at:\n  ${harness}\n\n` +
-    'Clone DeepSeek Harness and point DSH_REPO at it, e.g.\n' +
-    '  DSH_REPO=../deepseek-harness pnpm setup:harness\n',
-  )
-}
-
-const packages = ['plugin-kit', 'mcp-panel', 'skill-panel', 'example-panel', 'bundled-skills']
+// Every workspace package is probed, so a new panel needs no edit here.
+const packages = readdirSync(join(repoRoot, 'packages'), { withFileTypes: true })
+  .filter(entry => entry.isDirectory() && existsSync(join(repoRoot, 'packages', entry.name, 'package.json')))
+  .map(entry => entry.name)
 let linked = 0
 const missing = new Set()
 

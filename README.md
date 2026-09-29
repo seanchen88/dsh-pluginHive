@@ -1,21 +1,25 @@
 # dsh-pluginHive
 
 [DeepSeek Harness](https://deepseek-harness.github.io/deepseek-harness/) 的自定义插件集合。
-为 Web 设置页贡献两个管理面板，并提供一套可复制扩展的面板骨架。
+为 Web 设置页贡献管理面板、为左栏贡献一个 MCP 市场入口，并提供一套可复制扩展的面板骨架。
 
 | 包 | 设置页分区 | 能做什么 |
 |---|---|---|
 | [`@dsh-plugins/mcp-panel`](packages/mcp-panel) | **MCP 服务** | 添加 / 编辑 / 删除 / 启停 MCP 服务器，两种传输方式，自定义环境变量与请求头，展开查看 URL 与工具列表 |
 | [`@dsh-plugins/skill-panel`](packages/skill-panel) | **技能** | 列举技能、阅读 `SKILL.md`（内置 Markdown 渲染）、导入 zip 技能包、删除技能、一键新建（自动开新会话并预填 `/create-skill`） |
 | [`@dsh-plugins/bundled-skills`](packages/bundled-skills) | — | 随插件分发的技能内容（`create-skill`），首次挂载时自动引导到用户技能目录 |
+| [`@dsh-plugins/mcp-market-panel`](packages/mcp-market-panel) | **左栏「MCP 市场」** | 浏览 / 搜索两套 MCP 目录（随插件离线分发的社区目录 300 条 + 官方 MCP Registry 实时联网），填凭据后一键安装；安装窗逐字展示将执行的命令与将写入的配置，并报告是否真的连上 |
 | [`@dsh-plugins/plugin-kit`](packages/plugin-kit) | — | 共享基座：面板注册、Remote 代理、字典注册、自抄 UI 控件、零依赖 Markdown 渲染 |
 | [`@dsh-plugins/example-panel`](packages/example-panel) | 示例 | 无 Remote 的最小面板骨架，**复制它即可开始写新面板** |
 
 > 当前未发布到 npm，请从源码安装（见下）。
+> 随插件分发的 MCP 目录数据来自 Apache-2.0 许可的上游，归属见
+> [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。
 
 ## 环境要求
 
-- **DeepSeek Harness** `0.1.7-rc.2`（已验证）。面板依赖 harness 的 Cordis 插件框架与设置页插槽。
+- **DeepSeek Harness** `0.2.0-rc.1`（已验证；`0.1.7-rc.2` 亦通过）。面板依赖 harness 的 Cordis
+  插件框架、设置页插槽与左栏 `sidebar.panellist` / `main` 插槽。
 - **Node** `^22.19.0 || >=24.0.0`
 - **pnpm** 11（仓库以 `packageManager: pnpm@11.7.0` 锁定）
 
@@ -32,11 +36,14 @@ pnpm build                     # 产出各包的 lib/index.js 与 lib/client.js
 # 把需要的面板装进当前 dsh profile
 dsh plugin add ./packages/mcp-panel
 dsh plugin add ./packages/skill-panel
+dsh plugin add ./packages/mcp-market-panel   # 左栏「MCP 市场」
 ```
 
 `dsh plugin add` 会把包写入 profile 的依赖与 bundle 列表，插件自带的
 `packages/*/cordis.patch.yml` 负责挂载宿主端，浏览器端由包内 `dsh.client` 声明被自动发现。
-重新打开设置页即可看到「MCP 服务」「技能」两个分区。
+重新打开设置页即可看到「MCP 服务」「技能」两个分区；装了市场面板的话，左栏「插件」下方
+会出现「MCP 市场」入口。市场面板**不自己写配置**，安装动作复用 `mcp-panel` 的写路径，
+所以要装市场就同时装 `mcp-panel`。
 
 只想要其中一个面板，就只 add 其中一个。
 
@@ -85,6 +92,29 @@ dsh plugin add ./packages/skill-panel
 
 ![新建技能：自动开新会话并预填 /create-skill](assets/screenshots/new-session-prefill.png)
 
+### MCP 市场面板（左栏）
+
+安装后入口出现在**左栏「插件」下方**（不是设置页）。两套目录：
+
+- **本地目录**（默认）：随插件离线分发的社区目录 300 条，含分类筛选与全文搜索，**不联网**也能用。
+- **官方 Registry**：实时拉取 `registry.modelcontextprotocol.io`，游标翻页、按关键词搜索。
+
+安装流程：
+
+- **凭据表单**：目录条目里的 `${VAR}` 占位符会渲染成待填字段（名字含 `KEY`/`TOKEN`/`SECRET`
+  的按密码框显示）。**必填项没填时「确认安装」是禁用的** —— DSH 不展开环境变量占位符，
+  带着 `${...}` 装出去只会得到一个连不上的坏服务。
+- **安装前确认**：弹窗逐字显示将执行的命令与将写入 profile 的配置。装 MCP 等于在你的机器上
+  执行第三方 `npx` / `uvx` / `docker` 命令，请先确认来源可信。
+- **安装反馈**：写入期间显示进度并禁用开关；结束后自动关闭安装窗，弹结果窗分别报告
+  「写入结果」与「连接状态」（是否真的拉到工具）。
+- **传输门**：DSH 的 MCP 客户端只支持 `stdio` 与 `streamable-http`，`sse`-only 的条目会被
+  明确标为不支持而不是悄悄装坏。
+- 卡片上的状态点由**实际注册的工具数**推导：绿=已连接、红=已启用但没有工具、灰=已停用。
+
+> 市场面板不自己实现持久化：安装走 `mcp-panel` 的 `mcpAdmin` 远端，因此必须同时安装
+> `mcp-panel`。它缺席时面板照常渲染，安装按钮给出降级说明。
+
 ### create-skill（随插件分发的技能）
 
 引导你和模型一起把一个流程沉淀成技能：弄清意图 → 访谈 → 写 `SKILL.md` → 校验 → 试触发 → 迭代。
@@ -104,9 +134,11 @@ node packages/bundled-skills/skills/create-skill/scripts/validate_skill.mjs <技
 |---|---|
 | `pnpm build` | 构建全部包（宿主端 + 浏览器端） |
 | `pnpm typecheck` | 独立类型检查（用 `typecheck/stubs.d.ts`，**不需要** harness checkout） |
-| `pnpm verify` | 类型检查 + zip 导入用例（11 项） |
+| `pnpm verify` | 类型检查 + zip 导入用例（11 项）+ 市场目录映射用例（33 项） |
+| `pnpm test:zip` / `pnpm test:market` | 单独跑某一组用例 |
 | `pnpm watch` | 监听构建 |
 | `pnpm gen:cordis` | 生成本地开发用的 `cordis.yml` |
+| `pnpm gen:catalog` | 从上游 `servers.json` 重新生成市场面板内置的本地目录（见 THIRD_PARTY_LICENSES.md） |
 | `pnpm setup:harness` | 从本地 harness checkout 链接 `@deepseek-ai/*` peer（见下） |
 | `pnpm gen:typert` | 重新生成 Remote 产物（需要 harness checkout） |
 | `pnpm dev:web` | 构建后以本仓库补丁启动 harness Web 端 |
@@ -136,7 +168,7 @@ DSH_REPO=/path/to/deepseek-harness pnpm setup:harness
 
 | 内容 | 位置 |
 |---|---|
-| MCP 服务配置 | `~/.dsh/profiles/<profile>/cordis.patch.yml`（每台 server 一条 `insert` 记录，id 形如 `mcp-<name>`） |
+| MCP 服务配置 | `~/.dsh/profiles/<profile>/cordis.patch.yml`（每台 server 一条 `insert` 记录，id 形如 `mcp-<name>`）。市场面板安装的服务写的是**同一个文件、同一套实现** |
 | 用户级技能 | `~/.agents/skills/<name>/SKILL.md`、`~/.dsh/skills/<name>/SKILL.md` |
 | 项目级技能 | `<workspace>/.agents/skills/<name>/SKILL.md`、`<workspace>/.dsh/skills/<name>/SKILL.md` |
 | 随插件分发的技能 | `packages/bundled-skills/skills/`（引导安装到用户技能目录，按内容哈希决定是否升级） |
@@ -168,13 +200,15 @@ dsh-pluginHive/
 ├── assets/screenshots/  # README 配图
 ├── packages/
 │   ├── plugin-kit/        # 共享基座（面板注册 / Remote 代理 / UI 控件 / Markdown 渲染）
-│   ├── mcp-panel/         # MCP 服务面板
+│   ├── mcp-panel/         # MCP 服务面板（设置页）
+│   ├── mcp-market-panel/  # MCP 市场（左栏入口；含内置社区目录，见 THIRD_PARTY_LICENSES.md）
 │   ├── skill-panel/       # 技能面板
 │   ├── bundled-skills/    # 随插件分发的技能（create-skill）
 │   └── example-panel/     # 新面板模板
-├── scripts/               # gen-cordis / gen-typert / setup:harness / typert 收尾
+├── scripts/               # gen-cordis / gen-catalog / gen-typert / setup:harness
 ├── typecheck/             # 独立类型检查配置 + @deepseek-ai/* 类型 stub
 ├── cordis.yml             # 本地开发加载入口（pnpm gen:cordis 生成）
+├── THIRD_PARTY_LICENSES.md # 非 MIT 的再分发内容（内置目录数据等）
 └── AGENTS.md              # 工程约定与架构不变量
 ```
 
@@ -183,7 +217,11 @@ dsh-pluginHive/
 
 ## 许可证
 
-[MIT](LICENSE)
+本仓库源码采用 [MIT](LICENSE)。
+
+随插件分发的 MCP 目录数据来自 Apache-2.0 许可的上游，以及若干被内联进浏览器产物的
+第三方运行库（zod / clsx 等）——完整归属见 **[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)**，
+再分发时请一并保留。
 
 ## 链接
 

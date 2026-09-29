@@ -10,6 +10,7 @@
  *
  * @module @dsh-plugins/mcp-panel
  */
+import { homedir } from 'node:os'
 import type { Context } from '@deepseek-ai/cordis'
 // Type-only: pull the `Context` declaration merges for services reached via
 // `this.ctx` (matches packages/boot/config-editor's imports of these faces).
@@ -99,11 +100,12 @@ export class McpAdminController extends TypertRemoteService {
   @Remote('upsert')
   async upsert(config: McpServerConfig): Promise<McpWriteResult> {
     validateConfig(config)
-    const clash = this.mcpEntries().find(row => row.serverName === config.serverName && row.id !== entryId(config.serverName))
+    const resolved = withStdioCwd(config)
+    const clash = this.mcpEntries().find(row => row.serverName === resolved.serverName && row.id !== entryId(resolved.serverName))
     if (clash !== undefined) {
-      throw new RemoteError('gateway/bad-request', `server name "${config.serverName}" collides with entry "${clash.id}"`, {})
+      throw new RemoteError('gateway/bad-request', `server name "${resolved.serverName}" collides with entry "${clash.id}"`, {})
     }
-    const application = await upsertServer(this.ctx, config.serverName, config)
+    const application = await upsertServer(this.ctx, resolved.serverName, resolved)
     return { application, servers: await this.list() }
   }
 
@@ -141,6 +143,25 @@ function validateConfig(config: McpServerConfig): void {
   if (config.transport === 'streamable-http' && typeof config.url !== 'string') {
     throw new RemoteError('gateway/bad-request', 'streamable-http transport requires a url', {})
   }
+}
+
+/**
+ * Give a stdio server a working directory that exists.
+ *
+ * The harness zod schema defaults an omitted `cwd` to `''`, and `spawn(..., { cwd: '' })`
+ * fails outright (measured: `ENOENT`), so every stdio server written without a cwd is
+ * born unable to start. The panel's form leaves the field blank by design, so the host
+ * resolves it here rather than shipping a row that can never connect. Home is used
+ * because it always exists and is writable; it is recorded in the patch so the choice
+ * stays visible and editable.
+ *
+ * @param config - the config the panel submitted.
+ * @returns the same config with a concrete `cwd` for stdio rows.
+ */
+function withStdioCwd(config: McpServerConfig): McpServerConfig {
+  if (config.transport !== 'stdio') return config
+  const given = config.cwd?.trim()
+  return given ? { ...config, cwd: given } : { ...config, cwd: homedir() }
 }
 
 /**
