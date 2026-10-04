@@ -18,11 +18,12 @@
 
 ## 环境要求
 
-- **DeepSeek Harness** `0.2.0-rc.1`（实机验证；`0.1.7-rc.2` 亦通过）。
-  `0.2.1-alpha.1` 已做**源码级兼容性复核（结论：无需改动）**——逐文件比对该区间内我们 import 的
-  18 个 harness 目录，宿主插槽、`--dsw-alias-*` 主题词表与 Remote 契约均无破坏性变化；
-  在该版本上的实机复跑尚未进行。面板依赖 harness 的 Cordis
-  插件框架、设置页插槽与左栏 `sidebar.panellist` / `main` 插槽。
+- **DeepSeek Harness** `0.2.0-rc.1` 与 `0.2.1-alpha.1`（均实机验证；`0.1.7-rc.2` 亦通过）。
+  升级到 `0.2.1-alpha.1` 时**未改一行插件代码**：逐文件比对该区间内我们 import 的 18 个
+  harness 目录（10 个 ts 源码零改动），宿主插槽、`--dsw-alias-*` 主题词表（只增不删）、
+  Remote 契约均无破坏性变化；在 0.2.1-alpha.1 运行时上复跑市场/服务/技能三个面板，
+  左栏挂载、Registry 搜索、安装写路径、状态点三态、编辑回填、技能查看器全部通过，控制台无报错。
+  面板依赖 harness 的 Cordis 插件框架、设置页插槽与左栏 `sidebar.panellist` / `main` 插槽。
 - **Node** `^22.19.0 || >=24.0.0`
 - **pnpm** 11（仓库以 `packageManager: pnpm@11.7.0` 锁定）
 
