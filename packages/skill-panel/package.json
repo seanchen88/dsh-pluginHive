@@ -2,6 +2,9 @@
   "name": "@dsh-plugins/skill-panel",
   "description": "Agent Skills management panel for DeepSeek Harness: list, inspect, import from zip, create and delete skills.",
   "version": "0.1.0",
+  "engines": {
+    "dsh": ">=0.2.0-rc.1"
+  },
   "private": true,
   "type": "module",
   "main": "./lib/index.js",

@@ -2,6 +2,9 @@
   "name": "@dsh-plugins/mcp-market-panel",
   "description": "MCP marketplace panel for DeepSeek Harness: browse and search the official MCP Registry, then install a server into the current profile through the MCP services panel's write path.",
   "version": "0.1.0",
+  "engines": {
+    "dsh": ">=0.2.0-rc.1"
+  },
   "private": true,
   "type": "module",
   "main": "./lib/index.js",

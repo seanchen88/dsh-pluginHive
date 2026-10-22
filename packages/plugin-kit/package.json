@@ -2,6 +2,9 @@
   "name": "@dsh-plugins/plugin-kit",
   "description": "Shared base for DeepSeek Harness management panels: panel registration, Remote proxies, locale helper, self-contained UI controls and the client-bundle tsdown preset.",
   "version": "0.1.0",
+  "engines": {
+    "dsh": ">=0.2.0-rc.1"
+  },
   "private": true,
   "type": "module",
   "main": "./lib/index.js",

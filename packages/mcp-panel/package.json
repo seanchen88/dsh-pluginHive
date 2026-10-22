@@ -2,6 +2,9 @@
   "name": "@dsh-plugins/mcp-panel",
   "description": "MCP services management panel for DeepSeek Harness: list, add, edit, enable/disable and delete MCP servers through the profile patch layer.",
   "version": "0.1.0",
+  "engines": {
+    "dsh": ">=0.2.0-rc.1"
+  },
   "private": true,
   "type": "module",
   "main": "./lib/index.js",

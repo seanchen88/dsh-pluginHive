@@ -24,10 +24,32 @@ declare module '@deepseek-ai/cordis' {
 declare module '@deepseek-ai/dsh-typert-protocol' {
   import type { Context } from '@deepseek-ai/cordis'
 
-  export class RemoteError extends Error {
-    readonly code: string
-    constructor(code: string, message: string, details?: unknown, options?: { cause?: unknown })
+  /**
+   * Merge-extensible Remote failure vocabulary (mirrors DSH 0.2.1-rc.2). The
+   * package declares the universal carrier codes; owners merge their domain
+   * codes next to the throwing code (see each panel's src/remote-error-codes.d.ts).
+   */
+  export interface RemoteErrorDetailsMap {
+    'gateway/bad-request': { readonly issues?: readonly object[] }
+    'gateway/cancelled': {}
+    'gateway/internal': {}
   }
+
+  /** Every declared Remote failure code. */
+  export type RemoteErrorCode = keyof RemoteErrorDetailsMap
+
+  export class RemoteError<Code extends RemoteErrorCode = RemoteErrorCode> extends Error {
+    readonly isDSHRemoteError: true
+    constructor(
+      readonly code: Code,
+      message: string,
+      readonly details: RemoteErrorDetailsMap[Code],
+      options?: ErrorOptions,
+    )
+  }
+
+  /** Structurally identify a RemoteError across realm/bundle copies. */
+  export function remoteErrorOf(value: unknown): unknown
 
   /** Standard-decorator method decorator factory: `@Remote` or `@Remote('name')`. */
   export function Remote(option?: string | Record<string, unknown>): <T extends object, A extends unknown[], R>(

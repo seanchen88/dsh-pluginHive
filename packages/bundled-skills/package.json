@@ -2,6 +2,9 @@
   "name": "@dsh-plugins/bundled-skills",
   "description": "Agent Skills shipped with dsh-pluginHive, bootstrapped into the user's skills directory by the skill panel.",
   "version": "0.1.0",
+  "engines": {
+    "dsh": ">=0.2.0-rc.1"
+  },
   "private": true,
   "type": "module",
   "main": "./lib/index.js",

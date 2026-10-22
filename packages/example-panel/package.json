@@ -2,6 +2,9 @@
   "name": "@dsh-plugins/example-panel",
   "description": "Copy-me template for building a new DeepSeek Harness management panel on top of plugin-kit.",
   "version": "0.1.0",
+  "engines": {
+    "dsh": ">=0.2.0-rc.1"
+  },
   "private": true,
   "type": "module",
   "main": "./lib/index.js",
