@@ -29,8 +29,14 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
     constructor(code: string, message: string, details?: unknown, options?: { cause?: unknown })
   }
 
-  /** Standard-decorator method decorator factory: `@Remote` or `@Remote('name')`. */
-  export function Remote(option?: string | Record<string, unknown>): <T extends object, A extends unknown[], R>(
+  /**
+   * Standard-decorator method decorator factory: `@Remote`, `@Remote('name')`,
+   * or `@Remote({ name?, mode?, resources? })` (0.2.1-rc.1+ widened the options
+   * shape; only the first two forms are used by this repo).
+   */
+  export function Remote(
+    option?: string | { name?: string; mode?: 'stream'; resources?: Record<string, unknown> },
+  ): <T extends object, A extends unknown[], R>(
     target: (this: T, ...args: A) => R,
     context: ClassMethodDecoratorContext<T, (this: T, ...args: A) => R>,
   ) => void
@@ -38,6 +44,18 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
   export interface TypertRemoteContribution {
     readonly package: string
     readonly descriptors: readonly unknown[]
+  }
+
+  /** Result envelope of one Remote call (unchanged shape across 0.2.1-rc.x). */
+  export type RemoteResult<T> =
+    | { readonly ok: true; readonly value: T }
+    | { readonly ok: false; readonly error: { readonly code: string; readonly message: string; readonly details?: unknown } }
+
+  /** Lazy remote-definition carrier (0.2.1-rc.1+); generated `./remote` now exports `TypertRemoteInfo` instead of a plain contribution object. */
+  export interface TypertRemoteInfo {
+    readonly package: string
+    readonly descriptors: readonly unknown[]
+    readonly methods: Record<string, unknown>
   }
 
   /** Namespace map augmented by each generated `./remote` (and the hand-authored faces). */

@@ -49,6 +49,9 @@ if (!existsSync(generatorEntry)) {
 const { WorkspaceTypertGenerator } = await import(generatorEntry)
 
 const PACKAGES = ['@dsh-plugins/mcp-panel', '@dsh-plugins/skill-panel']
+// 0.2.1-rc.1+ generators also accept `rejectBuildOutputs`; it stays off here
+// because the staged packages are analyzed from `src/` (their `lib/` holds the
+// previously committed artifacts, which the analyzer must not load).
 const generator = new WorkspaceTypertGenerator(workspaceRoot, { checkDiagnostics: false })
 const artifacts = generator.generate(PACKAGES, ['host'])
 
